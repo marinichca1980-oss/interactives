@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ШІ у створенні відео: інтерактив для 10 класу</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f6;--card:#fff;--ink:#1b2540;--mute:#5b6580;--line:#d3d9e6;--vid:#3d5afe;--aud:#00a08e;--sub:#f2b705;--fx:#e5446d;--ok:#12805c;--bad:#c92a4b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a2b;--card:#1d2540;--ink:#e8ecf8;--mute:#9aa5c4;--line:#323d63;--vid:#7b8cff;--aud:#2fd0bb;--sub:#f5c842;--fx:#ff6f93;--ok:#4cd4a0;--bad:#ff7d96;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141a2b;--card:#1d2540;--ink:#e8ecf8;--mute:#9aa5c4;--line:#323d63;--vid:#7b8cff;--aud:#2fd0bb;--sub:#f5c842;--fx:#ff6f93;--ok:#4cd4a0;--bad:#ff7d96;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.6 Onest,system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 56px}
+h1,h2{font-family:Unbounded,Onest,system-ui,sans-serif;line-height:1.2;margin:0}
+h1{font-size:clamp(1.5rem,5vw,2.2rem);font-weight:700}
+h2{font-size:1.15rem;font-weight:500;margin-bottom:6px}
+p{margin:0 0 12px}
+.lead{color:var(--mute);max-width:60ch;margin-top:10px}
+.tl{margin:22px 0 8px;display:grid;gap:5px}
+.tr{display:flex;gap:5px;height:30px}
+.tr span{border-radius:6px;font-size:.72rem;display:flex;align-items:center;padding:0 9px;color:#fff;white-space:nowrap;overflow:hidden}
+.v span{background:var(--vid)}.a span{background:var(--aud)}.s span{background:var(--sub);color:#1b2540}.f span{background:var(--fx)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .v span,:root:not([data-theme="light"]) .a span,:root:not([data-theme="light"]) .f span{color:#10162a}}
+.tl-note{font-size:.82rem;color:var(--mute)}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:20px}
+.hint{color:var(--mute);font-size:.92rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+button,select,input{font:inherit;color:var(--ink)}
+.chip,.btn{border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:9px 13px;cursor:pointer;min-height:44px;text-align:left}
+.chip:hover,.btn:hover{border-color:var(--vid)}
+.chip[disabled]{opacity:.35;cursor:default}
+.btn.main{background:var(--vid);border-color:var(--vid);color:#fff;font-weight:500}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.main{color:#10162a}}
+:focus-visible{outline:3px solid var(--sub);outline-offset:2px}
+ol.seq{list-style:none;margin:12px 0;padding:0;display:grid;gap:7px;counter-reset:n}
+ol.seq li{counter-increment:n;display:flex;gap:10px;align-items:center;border:1.5px dashed var(--line);border-radius:10px;padding:9px 12px;min-height:44px}
+ol.seq li::before{content:counter(n);font-family:Unbounded,sans-serif;font-size:.8rem;color:var(--mute);min-width:1.2em}
+ol.seq li.ok{border:1.5px solid var(--ok)}ol.seq li.no{border:1.5px solid var(--bad)}
+.fb{margin-top:10px;font-weight:500;min-height:1.5em}
+.good{color:var(--ok)}.wrong{color:var(--bad)}
+.row{display:grid;grid-template-columns:1fr;gap:6px;padding:10px 0;border-top:1px solid var(--line)}
+@media(min-width:620px){.row{grid-template-columns:1fr 1fr;align-items:center;gap:14px}}
+select,input{width:100%;padding:10px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);min-height:44px}
+.q{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.q p{font-weight:500}
+.opts{display:grid;gap:7px}
+.opt.ok{border-color:var(--ok)}.opt.no{border-color:var(--bad)}
+.why{font-size:.92rem;color:var(--mute);margin-top:8px}
+label{display:block;font-size:.9rem;color:var(--mute);margin:10px 0 4px}
+.out{margin-top:14px;padding:14px;border-radius:10px;background:var(--bg);border:1.5px solid var(--line);font-size:.95rem;min-height:3em;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>Як ШІ створює відео</h1>
+<p class="lead">Від ідеї до готового ролика: збери монтажну лінійку, підбери інструменти, перевір себе, склади власний промпт і зроби промо-ролик. Орієнтовно 40 хвилин.</p>
+<div class="tl" aria-hidden="true">
+<div class="tr v"><span style="width:34%">Відео: генерація</span><span style="width:28%">Відео: зйомка</span><span style="width:22%">Відео: титри</span></div>
+<div class="tr a"><span style="width:42%">Озвучення (синтез мовлення)</span><span style="width:30%">Музика</span></div>
+<div class="tr s"><span style="width:60%">Субтитри (розпізнавання мовлення)</span></div>
+<div class="tr f"><span style="width:25%">Прибрати фон</span><span style="width:20%">Апскейлінг</span></div>
+</div>
+<p class="tl-note">Так виглядає монтажна лінійка: кожна доріжка — окремий тип медіа, і майже на кожній може працювати ШІ.</p>
+</header>
+
+<section id="s1">
+<h2>1. Збери конвеєр створення відео</h2>
+<p class="hint">Натискай етапи в тому порядку, в якому вони виконуються. Потім перевір.</p>
+<div class="chips" id="pool"></div>
+<ol class="seq" id="seq"></ol>
+<button class="btn main" id="chk1">Перевірити порядок</button>
+<button class="btn" id="rst1">Почати спочатку</button>
+<div class="fb" id="fb1" aria-live="polite"></div>
+</section>
+
+<section id="s2">
+<h2>2. Яка технологія ШІ розв’язує це завдання?</h2>
+<p class="hint">Обери відповідність для кожного завдання.</p>
+<div id="match"></div>
+<div class="fb" id="fb2" aria-live="polite"></div>
+</section>
+
+<section id="s3">
+<h2>3. Міні-тест: можливості та ризики</h2>
+<div id="quiz"></div>
+<div class="fb" id="fb3" aria-live="polite"></div>
+</section>
+
+<section id="s4">
+<h2>4. Склади промпт для генерації відео</h2>
+<p class="hint">Чим точніше опис, тим передбачуваніший результат. Заповни поля й скопіюй промпт у будь-який відеогенератор.</p>
+<label for="subj">Що відбувається в кадрі?</label>
+<input id="subj" value="кіт у скафандрі йде по Місяцю" maxlength="120">
+<label for="style">Стиль</label>
+<select id="style"><option>cinematic, realistic</option><option>2D cartoon animation</option><option>retro VHS look</option><option>documentary footage</option></select>
+<label for="shot">План</label>
+<select id="shot"><option>wide shot</option><option>medium shot</option><option>close-up</option><option>drone aerial view</option></select>
+<label for="cam">Рух камери</label>
+<select id="cam"><option>slow dolly in</option><option>static camera</option><option>handheld tracking</option><option>slow pan left</option></select>
+<label for="dur">Тривалість</label>
+<select id="dur"><option>5 seconds</option><option>8 seconds</option><option>10 seconds</option></select>
+<div class="out" id="out" aria-live="polite"></div>
+<p style="margin-top:12px"><button class="btn main" id="cp">Копіювати промпт</button></p>
+<p class="hint" id="cpfb"></p>
+<p class="hint">Завдання на урок: згенеруй 2–3 варіанти, змінюючи лише одне поле. Що змінилось у результаті? Запиши висновок.</p>
+</section>
+
+<section id="s5">
+<h2>5. Зроби промо-ролик на 15 секунд</h2>
+<p class="hint">Завдання: промо-ролик шкільного ШІ-клубу для дня відкритих дверей. У кожного відрізка обери найсильніший варіант, потім перевір.</p>
+<div class="tr v" id="ptl" aria-hidden="true" style="margin:10px 0 4px"></div>
+<div id="promo"></div>
+<p style="margin-top:14px"><button class="btn main" id="chk5">Перевірити сценарій</button></p>
+<div class="fb" id="fb5" aria-live="polite"></div>
+<h2 style="margin-top:22px">Чекліст перед публікацією</h2>
+<div id="cl"></div>
+<div class="fb" id="fbcl" aria-live="polite"></div>
+</section>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+/* 1. Pipeline */
+const steps=["Ідея та сценарій","Розкадрування","Збір матеріалу: зйомка або генерація","Монтаж і ефекти","Озвучення, музика, субтитри","Перевірка та позначка «створено за допомогою ШІ»"];
+let picked=[];
+function draw1(){
+  const pool=$("pool");pool.innerHTML="";
+  [...steps.keys()].sort((a,b)=>((a*5+3)%7)-((b*5+3)%7)).forEach(i=>{
+    const b=document.createElement("button");b.className="chip";b.textContent=steps[i];
+    b.disabled=picked.includes(i);b.onclick=()=>{picked.push(i);$("fb1").textContent="";draw1()};
+    pool.appendChild(b);
+  });
+  const seq=$("seq");seq.innerHTML="";
+  picked.forEach(i=>{const li=document.createElement("li");li.textContent=steps[i];seq.appendChild(li)});
+}
+$("chk1").onclick=()=>{
+  if(picked.length<steps.length){$("fb1").innerHTML='<span class="wrong">Додай усі шість етапів, потім перевіряй.</span>';return}
+  let n=0;[...$("seq").children].forEach((li,p)=>{const r=picked[p]===p;n+=r;li.className=r?"ok":"no"});
+  $("fb1").innerHTML=n===6?'<span class="good">Усе правильно! Спершу думаємо, потім генеруємо й монтуємо.</span>':`<span class="wrong">На своїх місцях ${n} із 6. Підказка: ШІ не може озвучити те, чого ще немає.</span>`;
+};
+$("rst1").onclick=()=>{picked=[];$("fb1").textContent="";draw1()};
+draw1();
+
+/* 2. Matching */
+const tech=["Розпізнавання мовлення","Генеративна модель відео","Сегментація зображення","Супер-роздільність (апскейлінг)","Синтез мовлення"];
+const tasks=[["Зробити автоматичні субтитри до інтерв’ю",0],["Отримати 5-секундний кліп за текстовим описом",1],["Вирізати людину з кадру без зеленого екрана",2],["Покращити якість старого відео 480p до Full HD",3],["Озвучити текст сценарію штучним голосом",4]];
+let done2={};
+tasks.forEach(([t,c],i)=>{
+  const d=document.createElement("div");d.className="row";
+  d.innerHTML=`<label style="margin:0;color:var(--ink)" for="m${i}">${t}</label><select id="m${i}"><option value="">Обери технологію…</option>${tech.map((x,j)=>`<option value="${j}">${x}</option>`).join("")}</select>`;
+  $("match").appendChild(d);
+  d.querySelector("select").onchange=e=>{
+    const v=e.target.value;if(v==="")return;
+    done2[i]=(+v===c);e.target.style.borderColor=done2[i]?"var(--ok)":"var(--bad)";
+    const ok=Object.values(done2).filter(Boolean).length;
+    $("fb2").innerHTML=ok===5?'<span class="good">Усі 5 вірно!</span>':`Правильно: ${ok} із 5. Червона рамка означає, що варто спробувати інший варіант.`;
+  };
+});
+
+/* 3. Quiz */
+const qs=[
+["Що таке дипфейк?",["Відео, у якому ШІ підміняє обличчя чи голос реальної людини","Будь-яке відео з анімацією","Стиснене відео малого розміру"],0,"Дипфейк імітує реальну людину. Тому його можна використати для обману, і потрібна обережність."],
+["Що правильно зробити, публікуючи ролик, створений за допомогою ШІ?",["Приховати це, щоб не знизити охоплення","Позначити, що контент згенеровано, і не вигадувати слів реальних людей","Видалити всі метадані"],1,"Чесне маркування допомагає глядачам довіряти вам і відрізняти факти від генерації."],
+["Чому в згенерованих відео бувають дивні помилки (зайві пальці, предмети, що зникають)?",["Це навмисний художній прийом","Модель вивчила статистичні закономірності з даних і не «розуміє» фізику світу","Камера була несправна"],1,"Модель передбачає, як має виглядати наступний кадр, тож результат слід завжди перевіряти."]
+];
+let sc=0,ans=0;
+qs.forEach(([q,o,c,w],qi)=>{
+  const d=document.createElement("div");d.className="q";
+  d.innerHTML=`<p>${q}</p><div class="opts"></div><div class="why"></div>`;
+  const box=d.querySelector(".opts");
+  o.forEach((t,i)=>{
+    const b=document.createElement("button");b.className="chip opt";b.textContent=t;
+    b.onclick=()=>{
+      [...box.children].forEach((x,k)=>{x.disabled=true;if(k===c)x.classList.add("ok")});
+      if(i!==c)b.classList.add("no");else sc++;
+      d.querySelector(".why").textContent=w;ans++;
+      if(ans===qs.length)$("fb3").innerHTML=`<span class="${sc===3?"good":"wrong"}">Результат: ${sc} із 3.</span>`;
+    };box.appendChild(b);
+  });
+  $("quiz").appendChild(d);
+});
+
+/* 4. Prompt builder */
+function build(){
+  const p=`${$("subj").value.trim()||"(опиши сцену)"}. ${$("style").value}, ${$("shot").value}, ${$("cam").value}. Duration: ${$("dur").value}.`;
+  $("out").textContent=p;return p;
+}
+["subj","style","shot","cam","dur"].forEach(i=>$(i).addEventListener("input",build));build();
+$("cp").onclick=async()=>{
+  try{await navigator.clipboard.writeText(build());$("cpfb").textContent="Промпт скопійовано."}
+  catch(e){$("cpfb").textContent="Не вдалося скопіювати автоматично. Виділи текст вручну."}
+};
+/* 5. Promo video */
+const promo=[
+["Початок (0–3 с): гачок","Гачок",20,[["Привіт! Ми шкільний клуб, і зараз розкажемо про нашу історію…",0,"Повільний вступ: глядач гортає далі ще до третьої секунди."],["Робот малює портрет учителя за 3 секунди. Текст: «Це зробив ШІ. Хочеш так само?»",1,"Одразу видно результат і інтригу."],["Логотип школи на тлі тиші",0,"Нічого не відбувається, тож не чіпляє."]]],
+["Вигода (3–8 с): що отримає глядач","Вигода",33,[["Короткі кадри: «За 4 заняття навчишся монтувати відео з ШІ»",1,"Конкретна вигода й чіткий результат."],["Довгий список усіх тем програми",0,"Занадто багато тексту для 5 секунд."],["Загальні слова про те, що технології важливі",0,"Нічого конкретного для глядача."]]],
+["Доказ (8–12 с): чому вірити","Доказ",27,[["Стокові кадри без підпису",0,"Нічого не доводить і не показує клуб."],["Фрагменти справжніх робіт учнів клубу",1,"Реальні приклади переконують найкраще."],["Згенерований «відгук випускника», якого не існує, без позначки",0,"Це обман і неетично: вигадані люди й відгуки порушують довіру."]]],
+["Заклик (12–15 с): що зробити далі","Заклик",20,[["«Слідкуйте за новинами»",0,"Незрозуміло, що робити й коли."],["«Дякуємо за увагу»",0,"Це прощання, а не заклик."],["«Приходь у четвер о 15:00, кабінет 21» і QR-код реєстрації",1,"Чітка дія, час і місце."]]]
+];
+const ch=[null,null,null,null];
+const ptl=$("ptl");
+promo.forEach(s=>{const sp=document.createElement("span");sp.style.cssText=`width:${s[2]}%;opacity:.3`;sp.textContent=s[1];ptl.appendChild(sp)});
+promo.forEach((s,i)=>{
+  const d=document.createElement("div");d.className="q";
+  d.innerHTML=`<p>${s[0]}</p><div class="opts"></div><div class="why"></div>`;
+  const box=d.querySelector(".opts");
+  s[3].forEach((o,j)=>{
+    const b=document.createElement("button");b.className="chip opt";b.textContent=o[0];
+    b.onclick=()=>{ch[i]=j;[...box.children].forEach((x,k)=>x.style.borderColor=k===j?"var(--vid)":"");ptl.children[i].style.opacity=1;$("fb5").textContent=""};
+    box.appendChild(b);
+  });
+  $("promo").appendChild(d);
+});
+$("chk5").onclick=()=>{
+  if(ch.includes(null)){$("fb5").innerHTML='<span class="wrong">Обери варіант у кожному з чотирьох відрізків.</span>';return}
+  let n=0;
+  [...$("promo").children].forEach((d,i)=>{
+    const o=promo[i][3][ch[i]];n+=o[1];
+    [...d.querySelector(".opts").children].forEach((b,k)=>{b.style.borderColor="";b.classList.toggle("ok",promo[i][3][k][1]===1);b.classList.toggle("no",k===ch[i]&&!o[1]);b.disabled=true});
+    d.querySelector(".why").textContent=o[2];
+  });
+  $("fb5").innerHTML=`<span class="${n===4?"good":"wrong"}">Сильних відрізків: ${n} із 4.</span> Правило промо: спочатку гачок, потім вигода, доказ і чітка дія.`;
+};
+const cl=["Формат 9:16 для Reels, Shorts і TikTok","Субтитри увімкнено (багато людей дивляться без звуку)","Головне видно вже в перші 3 секунди","Музика й озвучення не заважають одне одному","Є позначка, що частину кадрів згенеровано ШІ"];
+let nc=0;
+cl.forEach(t=>{
+  const l=document.createElement("label");l.style.cssText="display:flex;gap:10px;align-items:center;color:var(--ink);min-height:44px;margin:0";
+  l.innerHTML=`<input type="checkbox" style="width:22px;min-height:22px;height:22px"> ${t}`;
+  l.querySelector("input").onchange=e=>{nc+=e.target.checked?1:-1;$("fbcl").innerHTML=nc===cl.length?'<span class="good">Ролик готовий до публікації!</span>':`Виконано: ${nc} із ${cl.length}`};
+  $("cl").appendChild(l);
+});
+</script>
+</body>
+</html>
