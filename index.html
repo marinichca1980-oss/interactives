@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Excel: формули на практиці</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f6f3;--sf:#fff;--ink:#16302a;--mut:#58706a;--ln:#c9d9d0;--hd:#e3ede7;--ac:#2646d6;--acs:#e6ebff;--ok:#16794a;--oks:#dff3e7;--bad:#b3261e;--bads:#fbe4e2;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1c18;--sf:#16271f;--ink:#e4efe9;--mut:#9bb3aa;--ln:#2f4a3f;--hd:#1d3329;--ac:#8fa4ff;--acs:#1e2850;--ok:#6fd6a0;--oks:#143a28;--bad:#ff9a92;--bads:#3f1b18;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1c18;--sf:#16271f;--ink:#e4efe9;--mut:#9bb3aa;--ln:#2f4a3f;--hd:#1d3329;--ac:#8fa4ff;--acs:#1e2850;--ok:#6fd6a0;--oks:#143a28;--bad:#ff9a92;--bads:#3f1b18;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Onest,system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.15;margin:0 0 6px;font-weight:800;letter-spacing:-.01em}
+.lead{color:var(--mut);margin:0 0 18px;max-width:60ch}
+details.cs{background:var(--sf);border:1px solid var(--ln);border-radius:10px;padding:10px 14px;margin-bottom:18px}
+details.cs summary{cursor:pointer;font-weight:600}
+.cs table{border-collapse:collapse;margin-top:10px;width:100%;font-size:.93rem}
+.cs td{border-top:1px solid var(--ln);padding:6px 8px;vertical-align:top}
+code,.fx,input{font-family:"JetBrains Mono",ui-monospace,Consolas,monospace}
+code{background:var(--hd);padding:1px 6px;border-radius:4px;font-size:.88em}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tabs button{border:1px solid var(--ln);background:var(--sf);color:var(--ink);padding:8px 14px;border-radius:8px;font:600 .95rem Onest,system-ui,sans-serif;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ac);border-color:var(--ac);color:var(--bg)}
+.tabs button.done::after{content:" ✓"}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:12px;padding:18px}
+.card h2{margin:0 0 4px;font-size:1.25rem}
+.card p{margin:6px 0}
+.fbar{display:flex;align-items:center;gap:10px;border:1px solid var(--ln);border-radius:6px;margin:14px 0 8px;background:var(--bg);font-size:.9rem;min-height:36px}
+.fbar .nm{min-width:48px;text-align:center;padding:6px 8px;border-right:1px solid var(--ln);font-family:"JetBrains Mono",monospace;font-weight:500}
+.fbar .fx{color:var(--mut);font-style:italic}
+.fbar #fb{overflow:auto;white-space:nowrap}
+.wrap{overflow-x:auto}
+table.g{border-collapse:collapse;min-width:100%}
+.g th,.g td{border:1px solid var(--ln);padding:0;height:38px;min-width:92px;text-align:left}
+.g th{background:var(--hd);color:var(--mut);font-weight:600;font-size:.82rem;text-align:center;min-width:34px}
+.g td{padding:0 10px;white-space:nowrap}
+.g td.hd{background:var(--hd);font-weight:600}
+.g td.n{text-align:right}
+.g td.tg{padding:0;background:var(--acs)}
+.g input{width:100%;height:100%;min-height:36px;border:2px solid transparent;background:transparent;color:var(--ink);padding:0 8px;font-size:.9rem;outline:none}
+.g input:focus{border-color:var(--ac);background:var(--sf)}
+.g td.tg.ok{background:var(--oks)}
+.g td.tg.bad{background:var(--bads)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.row button{border:1px solid var(--ln);background:var(--sf);color:var(--ink);padding:9px 16px;border-radius:8px;font:600 .95rem Onest,system-ui,sans-serif;cursor:pointer}
+.row button.main{background:var(--ac);border-color:var(--ac);color:var(--bg)}
+button:focus-visible,summary:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+#hint{display:none;margin-top:12px;padding:10px 12px;border-left:4px solid var(--ac);background:var(--acs);border-radius:4px}
+#res{list-style:none;padding:0;margin:14px 0 0}
+#res li{padding:6px 10px;border-radius:6px;margin-bottom:4px;font-size:.93rem}
+#res li.ok{background:var(--oks);color:var(--ok)}
+#res li.bad{background:var(--bads);color:var(--bad)}
+#msg{margin-top:12px;font-weight:600}
+.prog{color:var(--mut);margin:0 0 10px;font-size:.93rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Формули в Excel: обчислюємо самі</h1>
+<p class="lead">Чотири завдання для 10 класу. У синіх клітинках запишіть формули — перевірка підставляє інші числа, тому формула має працювати завжди, а не лише для готових даних.</p>
+
+<details class="cs"><summary>Шпаргалка з формул</summary>
+<table>
+<tr><td><code>=B2*C2</code></td><td>Формула завжди починається зі знака <code>=</code>. Арифметика: <code>+ − * / ^</code></td></tr>
+<tr><td><code>=SUM(D2:D4)</code></td><td>Сума діапазону клітинок. Схожі: <code>AVERAGE</code> (середнє), <code>MAX</code>, <code>MIN</code></td></tr>
+<tr><td><code>=ROUND(A1;1)</code></td><td>Округлення до 1 знака після коми</td></tr>
+<tr><td><code>=IF(B2&gt;=7;"так";"ні")</code></td><td>Умова: якщо істина — перше значення, інакше — друге</td></tr>
+<tr><td><code>$B$5</code></td><td>Абсолютне посилання: не змінюється під час копіювання формули (клавіша F4)</td></tr>
+</table>
+<p style="margin:8px 0 0;color:var(--mut);font-size:.9rem">Між аргументами можна ставити <code>;</code> або <code>,</code> — залежно від налаштувань вашого Excel.</p></details>
+
+<div class="tabs" id="tabs" role="tablist"></div>
+<div class="card">
+<p class="prog" id="prog"></p>
+<h2 id="tt"></h2>
+<p id="td"></p>
+<div class="fbar"><span class="nm" id="nm">—</span><span class="fx">fx</span><span id="fb"></span></div>
+<div class="wrap" id="grid"></div>
+<div class="row">
+<button class="main" id="chk">Перевірити</button>
+<button id="hb">Підказка</button>
+<button id="rs">Почати спочатку</button>
+<button id="nx" class="main" style="display:none">Наступне завдання</button>
+</div>
+<div id="hint"></div>
+<ul id="res"></ul>
+<div id="msg" role="status"></div>
+</div>
+</main>
+<script>
+const rd=x=>Math.round(x*10)/10;
+const T=[
+{t:'Чек із магазину',d:'Обчисліть вартість кожного товару (ціна × кількість) у D2:D4 та загальну суму до сплати в D5.',
+ h:'У D2 введіть =B2*C2 і так само для рядків 3 та 4. Для суми: =SUM(D2:D4).',cols:4,rows:5,
+ cells:{A1:'Товар',B1:'Ціна, грн',C1:'Кількість',D1:'Вартість, грн',A2:'Зошит',B2:25,C2:4,A3:'Ручка',B3:12,C3:10,A4:'Лінійка',B4:18,C4:2,A5:'Разом:'},
+ targets:[{r:'D2',e:g=>g('B2')*g('C2')},{r:'D3',e:g=>g('B3')*g('C3')},{r:'D4',e:g=>g('B4')*g('C4')},
+  {r:'D5',e:g=>g('B2')*g('C2')+g('B3')*g('C3')+g('B4')*g('C4')}]},
+{t:'Середній бал',d:'У E2:E4 знайдіть середній бал кожного учня, округлений до 1 знака після коми. У E5 визначте найвищий середній бал.',
+ h:'Поєднайте функції: =ROUND(AVERAGE(B2:D2);1). Найвищий бал: =MAX(E2:E4).',cols:5,rows:5,
+ cells:{A1:'Учень',B1:'Алгебра',C1:'Геометрія',D1:'Інформатика',E1:'Середній бал',A2:'Оля',B2:8,C2:9,D2:10,A3:'Максим',B3:7,C3:8,D3:8,A4:'Ірина',B4:11,C4:12,D4:10,A5:'Найвищий:'},
+ targets:[2,3,4].map(i=>({r:'E'+i,e:g=>rd((g('B'+i)+g('C'+i)+g('D'+i))/3)})).concat([
+  {r:'E5',e:g=>Math.max(...[2,3,4].map(i=>rd((g('B'+i)+g('C'+i)+g('D'+i))/3)))}])},
+{t:'Умова IF',d:'Тест вважається складеним, якщо бал не менший за 7. У C2:C5 виведіть слово «Склав» або «Не склав».',
+ h:'=IF(B2>=7;"Склав";"Не склав") — не забудьте лапки навколо тексту.',cols:3,rows:5,
+ cells:{A1:'Учень',B1:'Бал за тест (макс. 12)',C1:'Результат',A2:'Андрій',B2:5,A3:'Богдана',B3:9,A4:'Віктор',B4:7,A5:'Галина',B5:12},
+ targets:[2,3,4,5].map(i=>({r:'C'+i,e:g=>g('B'+i)>=7?'Склав':'Не склав'}))},
+{t:'Знижка й абсолютне посилання',d:'У C2:C4 обчисліть ціну після знижки. Відсоток знижки лежить в одній клітинці B5 — посилайтеся на неї як на $B$5.',
+ h:'=B2*(1-$B$5/100). Знаки $ потрібні, щоб при копіюванні вниз посилання на B5 не зсувалося.',cols:3,rows:5,
+ cells:{A1:'Товар',B1:'Ціна, грн',C1:'Зі знижкою, грн',A2:'Рюкзак',B2:800,A3:'Кросівки',B3:1500,A4:'Куртка',B4:2400,A5:'Знижка, %',B5:15},
+ targets:[2,3,4].map(i=>({r:'C'+i,need:'$B$5',e:g=>g('B'+i)*(1-g('B5')/100)}))}
+];
+const fl=a=>a.flat(1).filter(v=>typeof v==='number');
+const FN={SUM:(...a)=>fl(a).reduce((x,y)=>x+y,0),AVERAGE:(...a)=>{a=fl(a);return a.reduce((x,y)=>x+y,0)/a.length},
+ MAX:(...a)=>Math.max(...fl(a)),MIN:(...a)=>Math.min(...fl(a)),COUNT:(...a)=>fl(a).length,
+ ROUND:(x,n=0)=>{const k=10**n;return Math.round(x*k)/k},IF:(c,a,b=false)=>c?a:b,ABS:Math.abs,SQRT:Math.sqrt};
+function ev(raw,get){
+ let s=raw.trim();
+ if(s[0]!=='=')throw new Error('Формула починається зі знака =');
+ s=s.slice(1).replace(/\$/g,'').replace(/;/g,',');
+ const st=[];
+ s=s.replace(/"([^"]*)"/g,(m,x)=>'__S'+(st.push(x)-1)+'__');
+ s=s.replace(/([A-Za-z]+)\(/g,(m,n)=>{n=n.toUpperCase();if(!FN[n])throw new Error('Невідома функція '+n);return n+'('});
+ s=s.replace(/(?<![\w"])([A-Fa-f])(\d{1,2}):([A-Fa-f])(\d{1,2})(?![\w"])/g,(m,a,b,c,d)=>`__R("${a.toUpperCase()}${b}","${c.toUpperCase()}${d}")`);
+ s=s.replace(/(?<![\w"])([A-Fa-f])(\d{1,2})(?![\w"(])/g,(m,a,b)=>`__C("${a.toUpperCase()}${b}")`);
+ s=s.replace(/<>/g,'!=').replace(/(?<![<>!=])=(?!=)/g,'==').replace(/\^/g,'**');
+ if(!/^[\w\s.,+\-*\/()<>=!"]*$/.test(s))throw new Error('Недопустимі символи у формулі');
+ s=s.replace(/__S(\d+)__/g,(m,i)=>JSON.stringify(st[i]));
+ const rng=(a,b)=>{const o=[];for(let c=a.charCodeAt(0);c<=b.charCodeAt(0);c++)for(let r=+a.slice(1);r<=+b.slice(1);r++)o.push(get(String.fromCharCode(c)+r));return o};
+ const names=Object.keys(FN);
+ const v=new Function('__R','__C',...names,'return ('+s+')')(rng,get,...names.map(n=>FN[n]));
+ if(typeof v==='number'&&!isFinite(v))throw new Error('Результат не є числом (перевірте ділення та діапазони)');
+ return v;
+}
+const mk=(ti,data,raws)=>{
+ const tg=new Set(T[ti].targets.map(x=>x.r));
+ const get=(r,dep=0)=>{
+  if(dep>20)throw new Error('Циклічне посилання');
+  if(tg.has(r)){const w=(raws[r]||'').trim();if(!w)return 0;
+   if(w[0]!=='='){const n=Number(w.replace(',','.'));return isNaN(n)?w:n}
+   return ev(w,x=>get(x,dep+1))}
+  const v=data[r];return v===undefined?0:v};
+ return get};
+const fmt=v=>typeof v==='number'?String(Math.round(v*1e4)/1e4).replace('.',','):String(v);
+const same=(a,b)=>typeof a==='number'&&typeof b==='number'?Math.abs(a-b)<1e-6:a===b;
+const vary=(b,ins,f)=>{const o={...b};ins.forEach(k=>o[k]=f(b[k]));return o};
+
+let cur=0;const raws=T.map(()=>({})),done=T.map(()=>false);
+const $=id=>document.getElementById(id);
+function shown(ti,r){
+ const w=(raws[ti][r]||'').trim();
+ if(w[0]!=='=')return raws[ti][r]||'';
+ try{return fmt(mk(ti,T[ti].cells,raws[ti])(r))}catch(e){return '#ПОМИЛКА'}
+}
+function draw(){
+ const t=T[cur],L='ABCDE'.slice(0,t.cols);
+ $('tt').textContent=t.t;$('td').textContent=t.d;$('hint').style.display='none';$('hint').textContent=t.h;
+ $('res').innerHTML='';$('msg').textContent='';$('nm').textContent='—';$('fb').textContent='';
+ $('nx').style.display=done[cur]&&cur<T.length-1?'':'none';
+ const tg=new Set(t.targets.map(x=>x.r));
+ let h='<table class="g"><tr><th></th>'+[...L].map(c=>'<th>'+c+'</th>').join('')+'</tr>';
+ for(let r=1;r<=t.rows;r++){
+  h+='<tr><th>'+r+'</th>';
+  for(const c of L){
+   const k=c+r;
+   if(tg.has(k))h+=`<td class="tg" id="td_${k}"><input data-r="${k}" aria-label="Клітинка ${k}" autocomplete="off" spellcheck="false" value="${shown(cur,k).replace(/"/g,'&quot;')}"></td>`;
+   else{const v=t.cells[k];h+=`<td class="${r===1?'hd':''} ${typeof v==='number'?'n':''}">${v===undefined?'':v}</td>`}
+  }
+  h+='</tr>';
+ }
+ $('grid').innerHTML=h+'</table>';
+ tabs();
+}
+function tabs(){
+ $('tabs').innerHTML=T.map((t,i)=>`<button role="tab" aria-selected="${i===cur}" class="${done[i]?'done':''}" data-i="${i}">${i+1}. ${t.t}</button>`).join('');
+ $('prog').textContent='Виконано '+done.filter(Boolean).length+' з '+T.length;
+}
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(b){cur=+b.dataset.i;draw()}};
+const g=$('grid');
+g.addEventListener('focusin',e=>{const i=e.target;if(i.dataset.r){i.value=raws[cur][i.dataset.r]||'';$('nm').textContent=i.dataset.r;$('fb').textContent=i.value}});
+g.addEventListener('input',e=>{const i=e.target,r=i.dataset.r;raws[cur][r]=i.value;$('fb').textContent=i.value;$('td_'+r).classList.remove('ok','bad')});
+g.addEventListener('focusout',e=>{const i=e.target;if(i.dataset.r)i.value=shown(cur,i.dataset.r)});
+g.addEventListener('keydown',e=>{
+ if(e.key!=='Enter'||!e.target.dataset.r)return;
+ const all=[...g.querySelectorAll('input')],n=all[all.indexOf(e.target)+1];
+ e.target.blur();if(n)n.focus();
+});
+$('hb').onclick=()=>{const h=$('hint');h.style.display=h.style.display==='block'?'none':'block'};
+$('rs').onclick=()=>{raws[cur]={};done[cur]=false;draw()};
+$('nx').onclick=()=>{cur++;draw()};
+$('chk').onclick=()=>{
+ const t=T[cur],base=t.cells,ins=Object.keys(base).filter(k=>typeof base[k]==='number');
+ const sets=[base,vary(base,ins,v=>v*2+1),vary(base,ins,v=>v+7)];
+ const res=t.targets.map(x=>{
+  const raw=(raws[cur][x.r]||'').trim();
+  if(!raw)return{r:x.r,ok:false,m:'клітинка порожня'};
+  if(raw[0]!=='=')return{r:x.r,ok:false,m:'це число, а не формула — почніть зі знака ='};
+  if(x.need&&!raw.replace(/\s/g,'').toUpperCase().includes(x.need))return{r:x.r,ok:false,m:'потрібне абсолютне посилання '+x.need+' (клавіша F4)'};
+  try{
+   for(let k=0;k<3;k++){
+    const got=mk(cur,sets[k],raws[cur])(x.r),ex=x.e(r=>sets[k][r]);
+    if(!same(got,ex))return{r:x.r,ok:false,m:k===0?`отримано ${fmt(got)}, а очікується ${fmt(ex)}`:'для інших чисел результат неправильний — використовуйте посилання на клітинки, а не числа'};
+   }
+   return{r:x.r,ok:true,m:'правильно'};
+  }catch(err){return{r:x.r,ok:false,m:err.name==='SyntaxError'?'помилка у формулі: перевірте дужки й коми':err.message}}
+ });
+ $('res').innerHTML=res.map(x=>`<li class="${x.ok?'ok':'bad'}"><b>${x.r}</b>: ${x.m}</li>`).join('');
+ res.forEach(x=>{const c=$('td_'+x.r);c.classList.remove('ok','bad');c.classList.add(x.ok?'ok':'bad')});
+ const all=res.every(x=>x.ok);
+ done[cur]=all;tabs();
+ const n=done.filter(Boolean).length;
+ $('msg').textContent=all?(n===T.length?'Усі завдання виконано. Відмінна робота!':'Чудово, завдання виконано!'):'Виправте клітинки, позначені червоним, і перевірте ще раз.';
+ $('nx').style.display=all&&cur<T.length-1?'':'none';
+};
+draw();
+</script>
+</body>
+</html>
